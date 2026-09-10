@@ -6,9 +6,6 @@
 
 <title>2hands｜二手衣小店</title>
 
-<!-- Supabase -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
 *{
     box-sizing:border-box;
@@ -16,324 +13,358 @@
 
 body{
     margin:0;
-    background:#f5f4f1;
-    color:#444;
     font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC",
     "PingFang TC","Microsoft JhengHei",sans-serif;
+    background:#f7f7f5;
+    color:#333;
 }
 
-/* 頂部 */
 header{
     background:#fff;
-    padding:28px 20px 20px;
-    border-bottom:1px solid #e5e3df;
+    padding:28px 20px 22px;
+    border-bottom:1px solid #e8e8e5;
     position:sticky;
     top:0;
     z-index:10;
 }
 
 .header-inner{
-    max-width:900px;
+    max-width:1100px;
     margin:auto;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
 }
 
 .logo{
-    font-size:22px;
-    font-weight:600;
-    letter-spacing:2px;
-    color:#333;
+    font-size:25px;
+    font-weight:700;
+    letter-spacing:1px;
 }
 
-.subtitle{
+.tagline{
     margin-top:5px;
-    font-size:12px;
+    font-size:13px;
+    color:#888;
+}
+
+button{
+    border:0;
+    cursor:pointer;
+    font-family:inherit;
+}
+
+.add-btn{
+    background:#333;
+    color:#fff;
+    padding:12px 18px;
+    border-radius:10px;
+    font-size:14px;
+}
+
+.add-btn:active{
+    transform:scale(.97);
+}
+
+.container{
+    max-width:1100px;
+    margin:0 auto;
+    padding:25px 20px 60px;
+}
+
+.empty{
+    text-align:center;
+    padding:100px 20px;
     color:#999;
 }
 
-/* 搜尋 */
-.search{
-    margin-top:18px;
-    width:100%;
-    border:1px solid #ddd;
-    background:#f8f7f5;
-    border-radius:8px;
-    padding:11px 13px;
-    font-size:14px;
-    outline:none;
+.empty-icon{
+    font-size:45px;
+    margin-bottom:15px;
 }
 
-/* 篩選 */
-.filters{
-    max-width:900px;
-    margin:20px auto 0;
-    padding:0 20px;
-    display:flex;
-    gap:8px;
-    overflow-x:auto;
+.empty-title{
+    font-size:18px;
+    color:#555;
+    margin-bottom:8px;
 }
 
-.filter-btn{
-    border:1px solid #ddd;
-    background:#fff;
-    padding:8px 15px;
-    border-radius:20px;
+.empty-text{
     font-size:13px;
-    color:#666;
-    white-space:nowrap;
-    cursor:pointer;
 }
 
-.filter-btn.active{
-    background:#555;
-    color:#fff;
-    border-color:#555;
-}
-
-/* 商品區 */
-.container{
-    max-width:900px;
-    margin:25px auto 60px;
-    padding:0 20px;
-}
-
-.product-grid{
+.products{
     display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:16px;
+    grid-template-columns:repeat(4,1fr);
+    gap:20px;
 }
 
-.product{
+.card{
     background:#fff;
-    border-radius:10px;
+    border-radius:14px;
     overflow:hidden;
-    border:1px solid #e8e6e2;
+    border:1px solid #e9e9e7;
 }
 
-.product-image{
+.card-photo{
     width:100%;
     aspect-ratio:1/1;
-    background:#eee;
-    position:relative;
-    overflow:hidden;
+    background:#f0f0ed;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#aaa;
+    font-size:13px;
 }
 
-.product-image img{
+.card-photo img{
     width:100%;
     height:100%;
     object-fit:cover;
 }
 
-.status{
-    position:absolute;
-    top:10px;
-    left:10px;
-    padding:5px 9px;
-    border-radius:5px;
-    font-size:11px;
-    background:rgba(255,255,255,.9);
+.card-body{
+    padding:15px;
 }
 
-.status.sold{
-    background:#555;
-    color:#fff;
-}
-
-.product-info{
-    padding:13px;
-}
-
-.type{
-    font-size:11px;
-    color:#999;
-    margin-bottom:5px;
-}
-
-.price{
-    font-size:19px;
+.card-name{
+    font-size:16px;
     font-weight:600;
-    color:#333;
+    margin-bottom:8px;
 }
 
-.note{
-    margin-top:7px;
+.card-price{
+    font-size:18px;
+    font-weight:700;
+    margin-bottom:12px;
+}
+
+.card-info{
+    font-size:12px;
+    color:#888;
+    line-height:1.8;
+}
+
+.card-description{
+    margin-top:10px;
     font-size:13px;
-    line-height:1.6;
-    color:#777;
-    white-space:pre-wrap;
+    line-height:1.7;
+    color:#666;
 }
 
-.edit-area{
-    margin-top:12px;
+.card-actions{
     display:flex;
-    gap:6px;
+    gap:8px;
+    margin-top:15px;
 }
 
-.edit-area button{
+.edit-btn,
+.delete-btn{
     flex:1;
-    border:0;
-    padding:8px;
-    border-radius:6px;
-    cursor:pointer;
+    padding:9px;
+    border-radius:8px;
     font-size:12px;
 }
 
 .edit-btn{
     background:#eee;
-    color:#555;
-}
-
-.sold-btn{
-    background:#555;
-    color:#fff;
+    color:#333;
 }
 
 .delete-btn{
-    background:#f1eeee;
-    color:#999;
+    background:#f3eeee;
+    color:#a55;
 }
 
-/* 管理區 */
-.admin{
-    max-width:900px;
-    margin:0 auto 50px;
-    padding:0 20px;
+/* 遮罩 */
+.modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.45);
+    z-index:100;
+    overflow-y:auto;
+    padding:30px 15px;
 }
 
-.admin-box{
+.modal.show{
+    display:block;
+}
+
+.modal-box{
+    width:100%;
+    max-width:600px;
+    margin:auto;
     background:#fff;
-    border:1px solid #e5e3df;
-    border-radius:10px;
-    padding:20px;
+    border-radius:16px;
+    padding:25px;
 }
 
-.admin-title{
-    font-size:16px;
-    font-weight:600;
-    margin-bottom:18px;
+.modal-title{
+    font-size:20px;
+    font-weight:700;
+    margin-bottom:22px;
 }
 
 .form-group{
-    margin-bottom:13px;
+    margin-bottom:17px;
 }
 
 .form-group label{
     display:block;
-    font-size:12px;
-    color:#777;
-    margin-bottom:6px;
+    font-size:13px;
+    margin-bottom:7px;
+    color:#555;
 }
 
-.form-group input,
-.form-group textarea,
-.form-group select{
+input,
+textarea,
+select{
     width:100%;
+    padding:12px;
     border:1px solid #ddd;
-    border-radius:6px;
-    padding:10px;
+    border-radius:9px;
+    font-family:inherit;
     font-size:14px;
+    background:#fff;
     outline:none;
-    background:#fafafa;
 }
 
-.form-group textarea{
-    min-height:80px;
+input:focus,
+textarea:focus,
+select:focus{
+    border-color:#888;
+}
+
+textarea{
+    min-height:110px;
     resize:vertical;
 }
 
-.photo-preview{
-    width:100px;
-    height:100px;
-    border-radius:6px;
-    object-fit:cover;
-    margin-top:8px;
-    display:none;
+.form-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
 }
 
-.add-btn{
+.photo-upload{
+    border:1px dashed #ccc;
+    border-radius:10px;
+    padding:20px;
+    text-align:center;
+    color:#999;
+    font-size:13px;
+}
+
+.photo-preview{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:8px;
+    margin-top:12px;
+}
+
+.preview-item{
+    position:relative;
+    aspect-ratio:1/1;
+    border-radius:8px;
+    overflow:hidden;
+    background:#eee;
+}
+
+.preview-item img{
     width:100%;
-    border:0;
-    background:#444;
+    height:100%;
+    object-fit:cover;
+}
+
+.remove-photo{
+    position:absolute;
+    top:5px;
+    right:5px;
+    width:22px;
+    height:22px;
+    border-radius:50%;
+    background:rgba(0,0,0,.65);
     color:#fff;
-    padding:12px;
-    border-radius:7px;
+    font-size:13px;
+}
+
+.modal-actions{
+    display:flex;
+    gap:10px;
+    margin-top:25px;
+}
+
+.cancel-btn,
+.save-btn{
+    flex:1;
+    padding:13px;
+    border-radius:9px;
     font-size:14px;
-    cursor:pointer;
 }
 
 .cancel-btn{
-    width:100%;
-    margin-top:8px;
-    border:1px solid #ddd;
-    background:#fff;
-    color:#777;
-    padding:11px;
-    border-radius:7px;
-    cursor:pointer;
-    display:none;
+    background:#eee;
 }
 
-/* 載入 */
-.loading{
-    text-align:center;
-    padding:60px 10px;
-    color:#aaa;
-    font-size:13px;
+.save-btn{
+    background:#333;
+    color:#fff;
 }
 
-/* 空白 */
-.empty{
-    text-align:center;
-    padding:60px 10px;
-    color:#aaa;
-    font-size:13px;
-}
-
-/* 錯誤 */
-.error-box{
-    background:#fff;
-    border:1px solid #ddd;
-    border-radius:10px;
-    padding:20px;
-    color:#888;
-    font-size:13px;
-    line-height:1.7;
-}
-
-/* 桌機 */
-@media(min-width:700px){
-    .product-grid{
-        grid-template-columns:repeat(3,1fr);
+@media(max-width:800px){
+    .products{
+        grid-template-columns:repeat(2,1fr);
+        gap:12px;
     }
 }
 
-/* 手機 */
 @media(max-width:500px){
-    header{
-        padding-top:22px;
+    .header-inner{
+        align-items:flex-start;
+    }
+
+    .logo{
+        font-size:21px;
+    }
+
+    .tagline{
+        font-size:11px;
+    }
+
+    .add-btn{
+        padding:10px 13px;
+        white-space:nowrap;
     }
 
     .container{
-        padding:0 12px;
+        padding:18px 12px 50px;
     }
 
-    .filters{
-        padding:0 12px;
-    }
-
-    .product-grid{
+    .products{
         gap:10px;
     }
 
-    .product-info{
-        padding:10px;
+    .card-body{
+        padding:12px;
     }
 
-    .price{
-        font-size:17px;
+    .card-name{
+        font-size:14px;
     }
 
-    .note{
-        font-size:12px;
+    .card-price{
+        font-size:16px;
+    }
+
+    .modal-box{
+        padding:20px;
+    }
+
+    .form-row{
+        grid-template-columns:1fr;
+        gap:0;
     }
 }
 </style>
@@ -343,394 +374,290 @@ header{
 
 <header>
     <div class="header-inner">
-        <div class="logo">SECOND HAND</div>
-        <div class="subtitle">
-            當🦘衣服穿不到，拜託大家照顧了
+        <div>
+            <div class="logo">2hands</div>
+            <div class="tagline">當🦘衣服穿不到，拜託大家照顧了</div>
         </div>
 
-        <input
-            id="searchInput"
-            class="search"
-            type="text"
-            placeholder="搜尋衣服..."
-            oninput="renderProducts()"
-        >
+        <button class="add-btn" onclick="openAddModal()">
+            ＋ 新增商品
+        </button>
     </div>
 </header>
 
-<div class="filters">
-    <button class="filter-btn active" onclick="setFilter('全部',this)">全部</button>
-    <button class="filter-btn" onclick="setFilter('全新',this)">全新</button>
-    <button class="filter-btn" onclick="setFilter('二手',this)">二手</button>
-    <button class="filter-btn" onclick="setFilter('上架中',this)">上架中</button>
-    <button class="filter-btn" onclick="setFilter('售出',this)">售出</button>
-</div>
-
 <main class="container">
 
-    <div id="loading" class="loading">
-        商品載入中 ♡
+    <div id="emptyState" class="empty">
+        <div class="empty-icon">🧺</div>
+        <div class="empty-title">目前還沒有商品</div>
+        <div class="empty-text">
+            按右上角「＋ 新增商品」開始新增你的衣服
+        </div>
     </div>
 
-    <div id="productGrid" class="product-grid"></div>
-
-    <div id="empty" class="empty" style="display:none;">
-        目前沒有商品 ♡
-    </div>
-
-    <div id="errorBox" class="error-box" style="display:none;"></div>
+    <div id="products" class="products"></div>
 
 </main>
 
-<!-- 管理區 -->
-<section class="admin">
 
-    <div class="admin-box">
+<!-- 新增 / 編輯視窗 -->
 
-        <div class="admin-title">
-            商品管理
+<div id="modal" class="modal">
+
+    <div class="modal-box">
+
+        <div class="modal-title" id="modalTitle">
+            新增商品
         </div>
 
-        <div class="form-group">
-            <label>衣服照片</label>
-
-            <input
-                type="file"
-                id="photoInput"
-                accept="image/*"
-                onchange="previewPhoto()"
-            >
-
-            <img id="photoPreview" class="photo-preview">
-        </div>
-
-        <div class="form-group">
-            <label>價格</label>
-
-            <input
-                type="number"
-                id="priceInput"
-                placeholder="例如 500"
-            >
-        </div>
-
-        <div class="form-group">
-            <label>狀況</label>
-
-            <select id="conditionInput">
-                <option value="全新">全新</option>
-                <option value="二手">二手</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label>備註</label>
-
-            <textarea
-                id="noteInput"
-                placeholder="例如：穿過2次、尺寸M、保存良好..."
-            ></textarea>
-        </div>
-
-        <div class="form-group">
-            <label>商品狀態</label>
-
-            <select id="statusInput">
-                <option value="上架中">上架中</option>
-                <option value="售出">售出</option>
-            </select>
-        </div>
-
-        <button
-            class="add-btn"
-            onclick="saveProduct()"
-            id="saveBtn">
-            ＋ 新增商品
-        </button>
-
-        <button
-            class="cancel-btn"
-            onclick="cancelEdit()"
-            id="cancelBtn">
-            取消編輯
-        </button>
-
-    </div>
-
-</section>
-
-<script>
-
-/* =========================================================
-   SUPABASE 設定
-   ========================================================= */
-
-const SUPABASE_URL =
-    "https://iutemzxxdxvcobndrnii.supabase.co";
-
-const SUPABASE_KEY =
-    "sb_publishable_xoMl-Lyx5VgkRm5iP5-j0Q_DPWUtQBN";
-
-const supabaseClient =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-    );
-
-
-/*
-   Storage 圖片資料夾名稱
-
-   如果你之前建立的 Storage bucket 不是 products，
-   我們測試時看到錯誤再改這一行。
-*/
-const STORAGE_BUCKET = "products";
-
-
-/* =========================================================
-   全域變數
-   ========================================================= */
-
-let products = [];
-
-let currentFilter = "全部";
-
-let editingId = null;
-
-let photoFile = null;
-
-let oldImageUrl = "";
-
-
-/* =========================================================
-   取得商品
-   ========================================================= */
-
-async function loadProducts(){
-
-    const loading =
-        document.getElementById("loading");
-
-    const errorBox =
-        document.getElementById("errorBox");
-
-    loading.style.display = "block";
-
-    errorBox.style.display = "none";
-
-    try{
-
-        const { data, error } =
-            await supabaseClient
-                .from("products")
-                .select("*")
-                .order("created_at", {
-                    ascending:false
-                });
-
-        if(error){
-            throw error;
-        }
-
-        products = data || [];
-
-        loading.style.display = "none";
-
-        renderProducts();
-
-    }catch(error){
-
-        console.error(error);
-
-        loading.style.display = "none";
-
-        errorBox.style.display = "block";
-
-        errorBox.innerHTML =
-            "商品資料載入失敗。<br><br>" +
-            "請確認 Supabase 的 products 資料表與公開讀取權限。<br><br>" +
-            "錯誤：" +
-            (error.message || "未知錯誤");
-    }
-}
-
-
-/* =========================================================
-   篩選
-   ========================================================= */
-
-function setFilter(filter,button){
-
-    currentFilter = filter;
-
-    document
-        .querySelectorAll(".filter-btn")
-        .forEach(btn =>
-            btn.classList.remove("active")
-        );
-
-    button.classList.add("active");
-
-    renderProducts();
-}
-
-
-/* =========================================================
-   顯示商品
-   ========================================================= */
-
-function renderProducts(){
-
-    const grid =
-        document.getElementById("productGrid");
-
-    const empty =
-        document.getElementById("empty");
-
-    const search =
-        document
-            .getElementById("searchInput")
-            .value
-            .toLowerCase()
-            .trim();
-
-    grid.innerHTML = "";
-
-    let filtered =
-        products.filter(product => {
-
-            const note =
-                String(product.note || "")
-                    .toLowerCase();
-
-            const condition =
-                String(product.condition || "")
-                    .toLowerCase();
-
-            const matchSearch =
-                note.includes(search) ||
-                condition.includes(search);
-
-            let matchFilter = true;
-
-            if(currentFilter === "全新"){
-                matchFilter =
-                    product.condition === "全新";
-            }
-
-            if(currentFilter === "二手"){
-                matchFilter =
-                    product.condition === "二手";
-            }
-
-            if(currentFilter === "上架中"){
-                matchFilter =
-                    product.status === "上架中";
-            }
-
-            if(currentFilter === "售出"){
-                matchFilter =
-                    product.status === "售出";
-            }
-
-            return matchSearch && matchFilter;
-
-        });
-
-
-    if(filtered.length === 0){
-
-        empty.style.display = "block";
-
-        return;
-
-    }
-
-    empty.style.display = "none";
-
-
-    filtered.forEach(product => {
-
-        const card =
-            document.createElement("div");
-
-        card.className = "product";
-
-        const image =
-            product.image_url ||
-            product.image ||
-            "";
-
-        card.innerHTML = `
-
-            <div class="product-image">
-
-                ${
-                    image
-                    ?
-                    `<img src="${image}" alt="二手衣">`
-                    :
-                    `<div style="
-                        width:100%;
-                        height:100%;
-                        display:flex;
-                        align-items:center;
-                        justify-content:center;
-                        color:#aaa;
-                        font-size:12px;
-                    ">沒有照片</div>`
-                }
-
-                <div class="status ${
-                    product.status === "售出"
-                    ? "sold"
-                    : ""
-                }">
-                    ${product.status || "上架中"}
+        <form id="productForm">
+
+            <div class="form-group">
+                <label>商品照片</label>
+
+                <div class="photo-upload">
+                    <input
+                        type="file"
+                        id="photoInput"
+                        accept="image/*"
+                        multiple
+                    >
+                    <div style="margin-top:8px;">
+                        可一次選擇多張照片
+                    </div>
+                </div>
+
+                <div id="photoPreview" class="photo-preview"></div>
+            </div>
+
+            <div class="form-group">
+                <label>商品名稱 *</label>
+                <input
+                    type="text"
+                    id="name"
+                    placeholder="例如：米白針織外套"
+                    required
+                >
+            </div>
+
+            <div class="form-row">
+
+                <div class="form-group">
+                    <label>售價 *</label>
+                    <input
+                        type="number"
+                        id="price"
+                        placeholder="500"
+                        min="0"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>尺寸</label>
+                    <input
+                        type="text"
+                        id="size"
+                        placeholder="S / M / L / Free"
+                    >
                 </div>
 
             </div>
 
-            <div class="product-info">
+            <div class="form-row">
 
-                <div class="type">
-                    ${product.condition || ""}
+                <div class="form-group">
+                    <label>品牌</label>
+                    <input
+                        type="text"
+                        id="brand"
+                        placeholder="品牌名稱"
+                    >
                 </div>
 
-                <div class="price">
-                    NT$ ${
-                        Number(product.price || 0)
-                        .toLocaleString()
+                <div class="form-group">
+                    <label>商品狀況</label>
+                    <select id="condition">
+                        <option value="">請選擇</option>
+                        <option value="全新">全新</option>
+                        <option value="近全新">近全新</option>
+                        <option value="良好">良好</option>
+                        <option value="正常使用痕跡">正常使用痕跡</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="form-group">
+                <label>分類</label>
+                <select id="category">
+                    <option value="">請選擇分類</option>
+                    <option value="上衣">上衣</option>
+                    <option value="外套">外套</option>
+                    <option value="洋裝">洋裝</option>
+                    <option value="褲子">褲子</option>
+                    <option value="裙子">裙子</option>
+                    <option value="鞋子">鞋子</option>
+                    <option value="包包">包包</option>
+                    <option value="配件">配件</option>
+                    <option value="其他">其他</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>商品介紹</label>
+                <textarea
+                    id="description"
+                    placeholder="寫一下商品狀況、穿過幾次、尺寸細節等等..."
+                ></textarea>
+            </div>
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    class="cancel-btn"
+                    onclick="closeModal()"
+                >
+                    取消
+                </button>
+
+                <button
+                    type="submit"
+                    class="save-btn"
+                >
+                    儲存商品
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script>
+
+let products = JSON.parse(
+    localStorage.getItem("twoHandsProducts") || "[]"
+);
+
+let editingId = null;
+let selectedImages = [];
+
+
+// ==========================
+// 初始化
+// ==========================
+
+renderProducts();
+
+
+// ==========================
+// 顯示商品
+// ==========================
+
+function renderProducts(){
+
+    const container = document.getElementById("products");
+    const emptyState = document.getElementById("emptyState");
+
+    container.innerHTML = "";
+
+    if(products.length === 0){
+
+        emptyState.style.display = "block";
+        return;
+
+    }
+
+    emptyState.style.display = "none";
+
+    products.forEach(product => {
+
+        const card = document.createElement("div");
+
+        card.className = "card";
+
+        let photoHTML = `
+            <div class="card-photo">
+                尚未上傳照片
+            </div>
+        `;
+
+        if(product.images && product.images.length > 0){
+
+            photoHTML = `
+                <div class="card-photo">
+                    <img src="${product.images[0]}" alt="">
+                </div>
+            `;
+
+        }
+
+        card.innerHTML = `
+
+            ${photoHTML}
+
+            <div class="card-body">
+
+                <div class="card-name">
+                    ${escapeHTML(product.name)}
+                </div>
+
+                <div class="card-price">
+                    NT$ ${Number(product.price).toLocaleString()}
+                </div>
+
+                <div class="card-info">
+
+                    ${product.brand
+                        ? `品牌：${escapeHTML(product.brand)}<br>`
+                        : ""
                     }
+
+                    ${product.size
+                        ? `尺寸：${escapeHTML(product.size)}<br>`
+                        : ""
+                    }
+
+                    ${product.condition
+                        ? `狀況：${escapeHTML(product.condition)}<br>`
+                        : ""
+                    }
+
+                    ${product.category
+                        ? `分類：${escapeHTML(product.category)}`
+                        : ""
+                    }
+
                 </div>
 
-                <div class="note">
-                    ${product.note || ""}
-                </div>
+                ${
+                    product.description
+                    ?
+                    `<div class="card-description">
+                        ${escapeHTML(product.description)}
+                    </div>`
+                    :
+                    ""
+                }
 
-                <div class="edit-area">
+                <div class="card-actions">
 
                     <button
                         class="edit-btn"
-                        onclick="editProduct('${product.id}')">
+                        onclick="editProduct('${product.id}')"
+                    >
                         編輯
                     </button>
 
                     <button
-                        class="sold-btn"
-                        onclick="toggleSold('${product.id}')">
-
-                        ${
-                            product.status === "售出"
-                            ? "重新上架"
-                            : "標記售出"
-                        }
-
-                    </button>
-
-                    <button
                         class="delete-btn"
-                        onclick="deleteProduct('${product.id}')">
+                        onclick="deleteProduct('${product.id}')"
+                    >
                         刪除
                     </button>
 
@@ -739,499 +666,345 @@ function renderProducts(){
             </div>
         `;
 
-        grid.appendChild(card);
+        container.appendChild(card);
 
     });
 
 }
 
 
-/* =========================================================
-   圖片選擇
-   ========================================================= */
+// ==========================
+// 開啟新增
+// ==========================
 
-function previewPhoto(){
+function openAddModal(){
 
-    const input =
-        document.getElementById("photoInput");
+    editingId = null;
+    selectedImages = [];
 
-    const file = input.files[0];
+    document.getElementById("modalTitle").textContent = "新增商品";
 
-    if(!file) return;
+    document.getElementById("productForm").reset();
 
-    photoFile = file;
+    document.getElementById("photoPreview").innerHTML = "";
 
-    const reader =
-        new FileReader();
-
-    reader.onload = function(e){
-
-        const preview =
-            document.getElementById("photoPreview");
-
-        preview.src = e.target.result;
-
-        preview.style.display = "block";
-
-    };
-
-    reader.readAsDataURL(file);
-}
-
-
-/* =========================================================
-   上傳圖片
-   ========================================================= */
-
-async function uploadPhoto(file){
-
-    if(!file) return null;
-
-    const extension =
-        file.name.split(".").pop();
-
-    const fileName =
-        Date.now() +
-        "-" +
-        Math.random()
-            .toString(36)
-            .substring(2) +
-        "." +
-        extension;
-
-    const filePath =
-        "clothes/" + fileName;
-
-
-    const { error } =
-        await supabaseClient
-            .storage
-            .from(STORAGE_BUCKET)
-            .upload(
-                filePath,
-                file,
-                {
-                    cacheControl:"3600",
-                    upsert:false
-                }
-            );
-
-    if(error){
-        throw error;
-    }
-
-
-    const { data } =
-        supabaseClient
-            .storage
-            .from(STORAGE_BUCKET)
-            .getPublicUrl(filePath);
-
-
-    return data.publicUrl;
-}
-
-
-/* =========================================================
-   新增 / 修改商品
-   ========================================================= */
-
-async function saveProduct(){
-
-    const saveBtn =
-        document.getElementById("saveBtn");
-
-    const price =
-        document
-            .getElementById("priceInput")
-            .value;
-
-    const condition =
-        document
-            .getElementById("conditionInput")
-            .value;
-
-    const note =
-        document
-            .getElementById("noteInput")
-            .value;
-
-    const status =
-        document
-            .getElementById("statusInput")
-            .value;
-
-
-    if(!price){
-
-        alert("請輸入價格");
-
-        return;
-
-    }
-
-
-    saveBtn.disabled = true;
-
-    saveBtn.innerText = "儲存中…";
-
-
-    try{
-
-        let imageUrl = oldImageUrl;
-
-
-        /* 有新照片 */
-        if(photoFile){
-
-            imageUrl =
-                await uploadPhoto(photoFile);
-
-        }
-
-
-        /* 修改 */
-        if(editingId){
-
-            const { error } =
-                await supabaseClient
-                    .from("products")
-                    .update({
-
-                        image_url:imageUrl,
-
-                        price:Number(price),
-
-                        condition:condition,
-
-                        note:note,
-
-                        status:status
-
-                    })
-                    .eq("id",editingId);
-
-
-            if(error){
-                throw error;
-            }
-
-        }
-
-        /* 新增 */
-        else{
-
-            if(!imageUrl){
-
-                alert("請上傳照片");
-
-                saveBtn.disabled = false;
-
-                saveBtn.innerText =
-                    "＋ 新增商品";
-
-                return;
-
-            }
-
-
-            const { error } =
-                await supabaseClient
-                    .from("products")
-                    .insert({
-
-                        image_url:imageUrl,
-
-                        price:Number(price),
-
-                        condition:condition,
-
-                        note:note,
-
-                        status:status
-
-                    });
-
-
-            if(error){
-                throw error;
-            }
-
-        }
-
-
-        alert(
-            editingId
-            ? "商品修改成功 ♡"
-            : "商品新增成功 ♡"
-        );
-
-
-        cancelEdit();
-
-        await loadProducts();
-
-
-    }catch(error){
-
-        console.error(error);
-
-        alert(
-            "儲存失敗：\n\n" +
-            (error.message || "未知錯誤")
-        );
-
-    }
-
-
-    saveBtn.disabled = false;
+    document.getElementById("modal").classList.add("show");
 
 }
 
 
-/* =========================================================
-   編輯
-   ========================================================= */
+// ==========================
+// 關閉
+// ==========================
 
-function editProduct(id){
+function closeModal(){
 
-    const product =
-        products.find(
-            p => String(p.id) === String(id)
-        );
+    document.getElementById("modal").classList.remove("show");
 
-    if(!product) return;
+}
 
 
-    editingId = product.id;
+// ==========================
+// 圖片選擇
+// ==========================
 
-    document
-        .getElementById("priceInput")
-        .value =
-        product.price || "";
+document
+.getElementById("photoInput")
+.addEventListener("change", function(e){
 
+    const files = Array.from(e.target.files);
 
-    document
-        .getElementById("conditionInput")
-        .value =
-        product.condition || "二手";
+    files.forEach(file => {
 
+        const reader = new FileReader();
 
-    document
-        .getElementById("noteInput")
-        .value =
-        product.note || "";
+        reader.onload = function(event){
 
+            selectedImages.push(event.target.result);
 
-    document
-        .getElementById("statusInput")
-        .value =
-        product.status || "上架中";
+            renderPhotoPreview();
 
+        };
 
-    oldImageUrl =
-        product.image_url ||
-        product.image ||
-        "";
+        reader.readAsDataURL(file);
+
+    });
+
+});
 
 
-    photoFile = null;
+// ==========================
+// 圖片預覽
+// ==========================
 
+function renderPhotoPreview(){
 
     const preview =
         document.getElementById("photoPreview");
 
+    preview.innerHTML = "";
 
-    if(oldImageUrl){
+    selectedImages.forEach((image,index) => {
 
-        preview.src = oldImageUrl;
+        const item = document.createElement("div");
 
-        preview.style.display = "block";
+        item.className = "preview-item";
 
-    }
+        item.innerHTML = `
 
+            <img src="${image}" alt="">
 
-    document
-        .getElementById("saveBtn")
-        .innerText =
-        "儲存修改";
+            <button
+                type="button"
+                class="remove-photo"
+                onclick="removePhoto(${index})"
+            >
+                ×
+            </button>
 
+        `;
 
-    document
-        .getElementById("cancelBtn")
-        .style.display =
-        "block";
-
-
-    window.scrollTo({
-
-        top:document.body.scrollHeight,
-
-        behavior:"smooth"
+        preview.appendChild(item);
 
     });
 
 }
 
 
-/* =========================================================
-   取消編輯
-   ========================================================= */
+// ==========================
+// 移除照片
+// ==========================
 
-function cancelEdit(){
+function removePhoto(index){
 
-    editingId = null;
+    selectedImages.splice(index,1);
 
-    photoFile = null;
-
-    oldImageUrl = "";
-
-
-    document
-        .getElementById("priceInput")
-        .value = "";
-
-
-    document
-        .getElementById("noteInput")
-        .value = "";
-
-
-    document
-        .getElementById("photoInput")
-        .value = "";
-
-
-    document
-        .getElementById("photoPreview")
-        .style.display = "none";
-
-
-    document
-        .getElementById("saveBtn")
-        .innerText =
-        "＋ 新增商品";
-
-
-    document
-        .getElementById("cancelBtn")
-        .style.display =
-        "none";
-
-
-    document
-        .getElementById("conditionInput")
-        .value = "全新";
-
-
-    document
-        .getElementById("statusInput")
-        .value = "上架中";
+    renderPhotoPreview();
 
 }
 
 
-/* =========================================================
-   售出 / 重新上架
-   ========================================================= */
+// ==========================
+// 儲存商品
+// ==========================
 
-async function toggleSold(id){
+document
+.getElementById("productForm")
+.addEventListener("submit", function(e){
 
-    const product =
-        products.find(
-            p => String(p.id) === String(id)
-        );
+    e.preventDefault();
 
-    if(!product) return;
+    const name =
+        document.getElementById("name").value.trim();
 
+    const price =
+        document.getElementById("price").value;
 
-    const newStatus =
-        product.status === "售出"
-        ? "上架中"
-        : "售出";
+    const size =
+        document.getElementById("size").value.trim();
 
+    const brand =
+        document.getElementById("brand").value.trim();
 
-    try{
+    const condition =
+        document.getElementById("condition").value;
 
-        const { error } =
-            await supabaseClient
-                .from("products")
-                .update({
-                    status:newStatus
-                })
-                .eq("id",id);
+    const category =
+        document.getElementById("category").value;
 
-
-        if(error){
-            throw error;
-        }
+    const description =
+        document.getElementById("description").value.trim();
 
 
-        await loadProducts();
+    if(!name || price === ""){
 
-    }catch(error){
-
-        console.error(error);
-
-        alert(
-            "更新失敗：\n\n" +
-            (error.message || "未知錯誤")
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   刪除
-   ========================================================= */
-
-async function deleteProduct(id){
-
-    if(!confirm("確定要刪除這件商品嗎？")){
+        alert("請填寫商品名稱和售價");
 
         return;
 
     }
 
 
-    try{
+    // 編輯
+    if(editingId){
 
-        const { error } =
-            await supabaseClient
-                .from("products")
-                .delete()
-                .eq("id",id);
+        const index =
+            products.findIndex(
+                p => p.id === editingId
+            );
 
+        if(index !== -1){
 
-        if(error){
-            throw error;
+            products[index] = {
+
+                ...products[index],
+
+                name,
+                price,
+                size,
+                brand,
+                condition,
+                category,
+                description,
+                images:selectedImages
+
+            };
+
         }
 
+    }
 
-        await loadProducts();
+    // 新增
+    else{
 
+        const product = {
 
-    }catch(error){
+            id:
+                Date.now().toString(),
 
-        console.error(error);
+            name,
+            price,
+            size,
+            brand,
+            condition,
+            category,
+            description,
+            images:selectedImages,
 
-        alert(
-            "刪除失敗：\n\n" +
-            (error.message || "未知錯誤")
-        );
+            createdAt:
+                new Date().toISOString()
+
+        };
+
+        products.unshift(product);
 
     }
+
+
+    localStorage.setItem(
+        "twoHandsProducts",
+        JSON.stringify(products)
+    );
+
+
+    closeModal();
+
+    renderProducts();
+
+});
+
+
+// ==========================
+// 編輯商品
+// ==========================
+
+function editProduct(id){
+
+    const product =
+        products.find(p => p.id === id);
+
+    if(!product) return;
+
+    editingId = id;
+
+    selectedImages =
+        [...(product.images || [])];
+
+    document.getElementById("modalTitle")
+        .textContent = "編輯商品";
+
+    document.getElementById("name")
+        .value = product.name || "";
+
+    document.getElementById("price")
+        .value = product.price || "";
+
+    document.getElementById("size")
+        .value = product.size || "";
+
+    document.getElementById("brand")
+        .value = product.brand || "";
+
+    document.getElementById("condition")
+        .value = product.condition || "";
+
+    document.getElementById("category")
+        .value = product.category || "";
+
+    document.getElementById("description")
+        .value = product.description || "";
+
+
+    renderPhotoPreview();
+
+    document.getElementById("modal")
+        .classList.add("show");
 
 }
 
 
-/* =========================================================
-   啟動
-   ========================================================= */
+// ==========================
+// 刪除商品
+// ==========================
 
-loadProducts();
+function deleteProduct(id){
+
+    const product =
+        products.find(p => p.id === id);
+
+    if(!product) return;
+
+    const yes =
+        confirm(`確定要刪除「${product.name}」嗎？`);
+
+    if(!yes) return;
+
+    products =
+        products.filter(
+            p => p.id !== id
+        );
+
+    localStorage.setItem(
+        "twoHandsProducts",
+        JSON.stringify(products)
+    );
+
+    renderProducts();
+
+}
+
+
+// ==========================
+// HTML 安全處理
+// ==========================
+
+function escapeHTML(text){
+
+    return String(text || "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+}
+
+
+// ==========================
+// 點遮罩關閉
+// ==========================
+
+document
+.getElementById("modal")
+.addEventListener("click", function(e){
+
+    if(e.target === this){
+
+        closeModal();
+
+    }
+
+});
 
 </script>
 
