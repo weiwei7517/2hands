@@ -4,7 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>二手衣小店</title>
+<title>2hands｜二手衣小店</title>
+
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 *{
@@ -269,12 +272,31 @@ header{
     display:none;
 }
 
+/* 載入 */
+.loading{
+    text-align:center;
+    padding:60px 10px;
+    color:#aaa;
+    font-size:13px;
+}
+
 /* 空白 */
 .empty{
     text-align:center;
     padding:60px 10px;
     color:#aaa;
     font-size:13px;
+}
+
+/* 錯誤 */
+.error-box{
+    background:#fff;
+    border:1px solid #ddd;
+    border-radius:10px;
+    padding:20px;
+    color:#888;
+    font-size:13px;
+    line-height:1.7;
 }
 
 /* 桌機 */
@@ -322,7 +344,9 @@ header{
 <header>
     <div class="header-inner">
         <div class="logo">SECOND HAND</div>
-        <div class="subtitle">去澳洲當🦘，喜歡衣服有新主人 ♡</div>
+        <div class="subtitle">
+            當🦘衣服穿不到，拜託大家照顧了
+        </div>
 
         <input
             id="searchInput"
@@ -344,11 +368,17 @@ header{
 
 <main class="container">
 
+    <div id="loading" class="loading">
+        商品載入中 ♡
+    </div>
+
     <div id="productGrid" class="product-grid"></div>
 
     <div id="empty" class="empty" style="display:none;">
         目前沒有商品 ♡
     </div>
+
+    <div id="errorBox" class="error-box" style="display:none;"></div>
 
 </main>
 
@@ -363,17 +393,20 @@ header{
 
         <div class="form-group">
             <label>衣服照片</label>
+
             <input
                 type="file"
                 id="photoInput"
                 accept="image/*"
                 onchange="previewPhoto()"
             >
+
             <img id="photoPreview" class="photo-preview">
         </div>
 
         <div class="form-group">
             <label>價格</label>
+
             <input
                 type="number"
                 id="priceInput"
@@ -383,6 +416,7 @@ header{
 
         <div class="form-group">
             <label>狀況</label>
+
             <select id="conditionInput">
                 <option value="全新">全新</option>
                 <option value="二手">二手</option>
@@ -391,6 +425,7 @@ header{
 
         <div class="form-group">
             <label>備註</label>
+
             <textarea
                 id="noteInput"
                 placeholder="例如：穿過2次、尺寸M、保存良好..."
@@ -399,17 +434,24 @@ header{
 
         <div class="form-group">
             <label>商品狀態</label>
+
             <select id="statusInput">
                 <option value="上架中">上架中</option>
                 <option value="售出">售出</option>
             </select>
         </div>
 
-        <button class="add-btn" onclick="saveProduct()" id="saveBtn">
+        <button
+            class="add-btn"
+            onclick="saveProduct()"
+            id="saveBtn">
             ＋ 新增商品
         </button>
 
-        <button class="cancel-btn" onclick="cancelEdit()" id="cancelBtn">
+        <button
+            class="cancel-btn"
+            onclick="cancelEdit()"
+            id="cancelBtn">
             取消編輯
         </button>
 
@@ -419,59 +461,113 @@ header{
 
 <script>
 
-let products = JSON.parse(localStorage.getItem("secondHandProducts")) || [];
+/* =========================================================
+   SUPABASE 設定
+   ========================================================= */
+
+const SUPABASE_URL =
+    "https://iutemzxxdxvcobndrnii.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_xoMl-Lyx5VgkRm5iP5-j0Q_DPWUtQBN";
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+/*
+   Storage 圖片資料夾名稱
+
+   如果你之前建立的 Storage bucket 不是 products，
+   我們測試時看到錯誤再改這一行。
+*/
+const STORAGE_BUCKET = "products";
+
+
+/* =========================================================
+   全域變數
+   ========================================================= */
+
+let products = [];
 
 let currentFilter = "全部";
 
 let editingId = null;
 
-let photoData = "";
+let photoFile = null;
+
+let oldImageUrl = "";
 
 
-/* 預設商品 */
-if(products.length === 0){
+/* =========================================================
+   取得商品
+   ========================================================= */
 
-    products = [
-        {
-            id:1,
-            image:"https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=800",
-            price:500,
-            condition:"二手",
-            note:"穿過幾次，保存良好",
-            status:"上架中"
-        },
-        {
-            id:2,
-            image:"https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=800",
-            price:680,
-            condition:"全新",
-            note:"全新未穿，吊牌還在",
-            status:"上架中"
+async function loadProducts(){
+
+    const loading =
+        document.getElementById("loading");
+
+    const errorBox =
+        document.getElementById("errorBox");
+
+    loading.style.display = "block";
+
+    errorBox.style.display = "none";
+
+    try{
+
+        const { data, error } =
+            await supabaseClient
+                .from("products")
+                .select("*")
+                .order("created_at", {
+                    ascending:false
+                });
+
+        if(error){
+            throw error;
         }
-    ];
 
-    saveData();
+        products = data || [];
+
+        loading.style.display = "none";
+
+        renderProducts();
+
+    }catch(error){
+
+        console.error(error);
+
+        loading.style.display = "none";
+
+        errorBox.style.display = "block";
+
+        errorBox.innerHTML =
+            "商品資料載入失敗。<br><br>" +
+            "請確認 Supabase 的 products 資料表與公開讀取權限。<br><br>" +
+            "錯誤：" +
+            (error.message || "未知錯誤");
+    }
 }
 
 
-/* 儲存 */
-function saveData(){
+/* =========================================================
+   篩選
+   ========================================================= */
 
-    localStorage.setItem(
-        "secondHandProducts",
-        JSON.stringify(products)
-    );
-
-}
-
-
-/* 篩選 */
 function setFilter(filter,button){
 
     currentFilter = filter;
 
-    document.querySelectorAll(".filter-btn")
-        .forEach(btn => btn.classList.remove("active"));
+    document
+        .querySelectorAll(".filter-btn")
+        .forEach(btn =>
+            btn.classList.remove("active")
+        );
 
     button.classList.add("active");
 
@@ -479,45 +575,67 @@ function setFilter(filter,button){
 }
 
 
-/* 顯示商品 */
+/* =========================================================
+   顯示商品
+   ========================================================= */
+
 function renderProducts(){
 
-    const grid = document.getElementById("productGrid");
-    const empty = document.getElementById("empty");
+    const grid =
+        document.getElementById("productGrid");
+
+    const empty =
+        document.getElementById("empty");
 
     const search =
-        document.getElementById("searchInput")
-        .value
-        .toLowerCase();
+        document
+            .getElementById("searchInput")
+            .value
+            .toLowerCase()
+            .trim();
 
     grid.innerHTML = "";
 
-    let filtered = products.filter(product => {
+    let filtered =
+        products.filter(product => {
 
-        const matchSearch =
-            product.note.toLowerCase().includes(search);
+            const note =
+                String(product.note || "")
+                    .toLowerCase();
 
-        let matchFilter = true;
+            const condition =
+                String(product.condition || "")
+                    .toLowerCase();
 
-        if(currentFilter === "全新"){
-            matchFilter = product.condition === "全新";
-        }
+            const matchSearch =
+                note.includes(search) ||
+                condition.includes(search);
 
-        if(currentFilter === "二手"){
-            matchFilter = product.condition === "二手";
-        }
+            let matchFilter = true;
 
-        if(currentFilter === "上架中"){
-            matchFilter = product.status === "上架中";
-        }
+            if(currentFilter === "全新"){
+                matchFilter =
+                    product.condition === "全新";
+            }
 
-        if(currentFilter === "售出"){
-            matchFilter = product.status === "售出";
-        }
+            if(currentFilter === "二手"){
+                matchFilter =
+                    product.condition === "二手";
+            }
 
-        return matchSearch && matchFilter;
+            if(currentFilter === "上架中"){
+                matchFilter =
+                    product.status === "上架中";
+            }
 
-    });
+            if(currentFilter === "售出"){
+                matchFilter =
+                    product.status === "售出";
+            }
+
+            return matchSearch && matchFilter;
+
+        });
 
 
     if(filtered.length === 0){
@@ -533,18 +651,42 @@ function renderProducts(){
 
     filtered.forEach(product => {
 
-        const card = document.createElement("div");
+        const card =
+            document.createElement("div");
 
         card.className = "product";
+
+        const image =
+            product.image_url ||
+            product.image ||
+            "";
 
         card.innerHTML = `
 
             <div class="product-image">
 
-                <img src="${product.image}">
+                ${
+                    image
+                    ?
+                    `<img src="${image}" alt="二手衣">`
+                    :
+                    `<div style="
+                        width:100%;
+                        height:100%;
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        color:#aaa;
+                        font-size:12px;
+                    ">沒有照片</div>`
+                }
 
-                <div class="status ${product.status === "售出" ? "sold" : ""}">
-                    ${product.status}
+                <div class="status ${
+                    product.status === "售出"
+                    ? "sold"
+                    : ""
+                }">
+                    ${product.status || "上架中"}
                 </div>
 
             </div>
@@ -552,11 +694,14 @@ function renderProducts(){
             <div class="product-info">
 
                 <div class="type">
-                    ${product.condition}
+                    ${product.condition || ""}
                 </div>
 
                 <div class="price">
-                    NT$ ${Number(product.price).toLocaleString()}
+                    NT$ ${
+                        Number(product.price || 0)
+                        .toLocaleString()
+                    }
                 </div>
 
                 <div class="note">
@@ -567,19 +712,25 @@ function renderProducts(){
 
                     <button
                         class="edit-btn"
-                        onclick="editProduct(${product.id})">
+                        onclick="editProduct('${product.id}')">
                         編輯
                     </button>
 
                     <button
                         class="sold-btn"
-                        onclick="toggleSold(${product.id})">
-                        ${product.status === "售出" ? "重新上架" : "標記售出"}
+                        onclick="toggleSold('${product.id}')">
+
+                        ${
+                            product.status === "售出"
+                            ? "重新上架"
+                            : "標記售出"
+                        }
+
                     </button>
 
                     <button
                         class="delete-btn"
-                        onclick="deleteProduct(${product.id})">
+                        onclick="deleteProduct('${product.id}')">
                         刪除
                     </button>
 
@@ -595,48 +746,120 @@ function renderProducts(){
 }
 
 
-/* 圖片預覽 */
+/* =========================================================
+   圖片選擇
+   ========================================================= */
+
 function previewPhoto(){
 
-    const file =
-        document.getElementById("photoInput").files[0];
+    const input =
+        document.getElementById("photoInput");
+
+    const file = input.files[0];
 
     if(!file) return;
 
-    const reader = new FileReader();
+    photoFile = file;
+
+    const reader =
+        new FileReader();
 
     reader.onload = function(e){
-
-        photoData = e.target.result;
 
         const preview =
             document.getElementById("photoPreview");
 
-        preview.src = photoData;
+        preview.src = e.target.result;
 
         preview.style.display = "block";
 
     };
 
     reader.readAsDataURL(file);
-
 }
 
 
-/* 新增 / 修改 */
-function saveProduct(){
+/* =========================================================
+   上傳圖片
+   ========================================================= */
+
+async function uploadPhoto(file){
+
+    if(!file) return null;
+
+    const extension =
+        file.name.split(".").pop();
+
+    const fileName =
+        Date.now() +
+        "-" +
+        Math.random()
+            .toString(36)
+            .substring(2) +
+        "." +
+        extension;
+
+    const filePath =
+        "clothes/" + fileName;
+
+
+    const { error } =
+        await supabaseClient
+            .storage
+            .from(STORAGE_BUCKET)
+            .upload(
+                filePath,
+                file,
+                {
+                    cacheControl:"3600",
+                    upsert:false
+                }
+            );
+
+    if(error){
+        throw error;
+    }
+
+
+    const { data } =
+        supabaseClient
+            .storage
+            .from(STORAGE_BUCKET)
+            .getPublicUrl(filePath);
+
+
+    return data.publicUrl;
+}
+
+
+/* =========================================================
+   新增 / 修改商品
+   ========================================================= */
+
+async function saveProduct(){
+
+    const saveBtn =
+        document.getElementById("saveBtn");
 
     const price =
-        document.getElementById("priceInput").value;
+        document
+            .getElementById("priceInput")
+            .value;
 
     const condition =
-        document.getElementById("conditionInput").value;
+        document
+            .getElementById("conditionInput")
+            .value;
 
     const note =
-        document.getElementById("noteInput").value;
+        document
+            .getElementById("noteInput")
+            .value;
 
     const status =
-        document.getElementById("statusInput").value;
+        document
+            .getElementById("statusInput")
+            .value;
 
 
     if(!price){
@@ -648,173 +871,367 @@ function saveProduct(){
     }
 
 
-    if(editingId){
+    saveBtn.disabled = true;
 
-        const product =
-            products.find(p => p.id === editingId);
+    saveBtn.innerText = "儲存中…";
 
-        product.price = price;
 
-        product.condition = condition;
+    try{
 
-        product.note = note;
+        let imageUrl = oldImageUrl;
 
-        product.status = status;
 
-        if(photoData){
-            product.image = photoData;
-        }
+        /* 有新照片 */
+        if(photoFile){
 
-    }else{
-
-        if(!photoData){
-
-            alert("請上傳照片");
-
-            return;
+            imageUrl =
+                await uploadPhoto(photoFile);
 
         }
 
-        products.unshift({
 
-            id:Date.now(),
+        /* 修改 */
+        if(editingId){
 
-            image:photoData,
+            const { error } =
+                await supabaseClient
+                    .from("products")
+                    .update({
 
-            price:price,
+                        image_url:imageUrl,
 
-            condition:condition,
+                        price:Number(price),
 
-            note:note,
+                        condition:condition,
 
-            status:status
+                        note:note,
 
-        });
+                        status:status
+
+                    })
+                    .eq("id",editingId);
+
+
+            if(error){
+                throw error;
+            }
+
+        }
+
+        /* 新增 */
+        else{
+
+            if(!imageUrl){
+
+                alert("請上傳照片");
+
+                saveBtn.disabled = false;
+
+                saveBtn.innerText =
+                    "＋ 新增商品";
+
+                return;
+
+            }
+
+
+            const { error } =
+                await supabaseClient
+                    .from("products")
+                    .insert({
+
+                        image_url:imageUrl,
+
+                        price:Number(price),
+
+                        condition:condition,
+
+                        note:note,
+
+                        status:status
+
+                    });
+
+
+            if(error){
+                throw error;
+            }
+
+        }
+
+
+        alert(
+            editingId
+            ? "商品修改成功 ♡"
+            : "商品新增成功 ♡"
+        );
+
+
+        cancelEdit();
+
+        await loadProducts();
+
+
+    }catch(error){
+
+        console.error(error);
+
+        alert(
+            "儲存失敗：\n\n" +
+            (error.message || "未知錯誤")
+        );
 
     }
 
 
-    saveData();
-
-    renderProducts();
-
-    cancelEdit();
+    saveBtn.disabled = false;
 
 }
 
 
-/* 編輯 */
+/* =========================================================
+   編輯
+   ========================================================= */
+
 function editProduct(id){
 
     const product =
-        products.find(p => p.id === id);
+        products.find(
+            p => String(p.id) === String(id)
+        );
 
     if(!product) return;
 
-    editingId = id;
 
-    document.getElementById("priceInput").value =
-        product.price;
+    editingId = product.id;
 
-    document.getElementById("conditionInput").value =
-        product.condition;
-
-    document.getElementById("noteInput").value =
-        product.note;
-
-    document.getElementById("statusInput").value =
-        product.status;
+    document
+        .getElementById("priceInput")
+        .value =
+        product.price || "";
 
 
-    photoData = product.image;
+    document
+        .getElementById("conditionInput")
+        .value =
+        product.condition || "二手";
+
+
+    document
+        .getElementById("noteInput")
+        .value =
+        product.note || "";
+
+
+    document
+        .getElementById("statusInput")
+        .value =
+        product.status || "上架中";
+
+
+    oldImageUrl =
+        product.image_url ||
+        product.image ||
+        "";
+
+
+    photoFile = null;
+
 
     const preview =
         document.getElementById("photoPreview");
 
-    preview.src = product.image;
 
-    preview.style.display = "block";
+    if(oldImageUrl){
+
+        preview.src = oldImageUrl;
+
+        preview.style.display = "block";
+
+    }
 
 
-    document.getElementById("saveBtn").innerText =
+    document
+        .getElementById("saveBtn")
+        .innerText =
         "儲存修改";
 
-    document.getElementById("cancelBtn").style.display =
+
+    document
+        .getElementById("cancelBtn")
+        .style.display =
         "block";
 
 
     window.scrollTo({
+
         top:document.body.scrollHeight,
+
         behavior:"smooth"
+
     });
 
 }
 
 
-/* 取消編輯 */
+/* =========================================================
+   取消編輯
+   ========================================================= */
+
 function cancelEdit(){
 
     editingId = null;
 
-    photoData = "";
+    photoFile = null;
 
-    document.getElementById("priceInput").value = "";
+    oldImageUrl = "";
 
-    document.getElementById("noteInput").value = "";
 
-    document.getElementById("photoInput").value = "";
+    document
+        .getElementById("priceInput")
+        .value = "";
 
-    document.getElementById("photoPreview").style.display =
-        "none";
 
-    document.getElementById("saveBtn").innerText =
+    document
+        .getElementById("noteInput")
+        .value = "";
+
+
+    document
+        .getElementById("photoInput")
+        .value = "";
+
+
+    document
+        .getElementById("photoPreview")
+        .style.display = "none";
+
+
+    document
+        .getElementById("saveBtn")
+        .innerText =
         "＋ 新增商品";
 
-    document.getElementById("cancelBtn").style.display =
+
+    document
+        .getElementById("cancelBtn")
+        .style.display =
         "none";
+
+
+    document
+        .getElementById("conditionInput")
+        .value = "全新";
+
+
+    document
+        .getElementById("statusInput")
+        .value = "上架中";
 
 }
 
 
-/* 售出 */
-function toggleSold(id){
+/* =========================================================
+   售出 / 重新上架
+   ========================================================= */
+
+async function toggleSold(id){
 
     const product =
-        products.find(p => p.id === id);
+        products.find(
+            p => String(p.id) === String(id)
+        );
 
     if(!product) return;
 
-    product.status =
+
+    const newStatus =
         product.status === "售出"
         ? "上架中"
         : "售出";
 
-    saveData();
 
-    renderProducts();
+    try{
 
-}
+        const { error } =
+            await supabaseClient
+                .from("products")
+                .update({
+                    status:newStatus
+                })
+                .eq("id",id);
 
 
-/* 刪除 */
-function deleteProduct(id){
+        if(error){
+            throw error;
+        }
 
-    if(!confirm("確定要刪除這件商品嗎？")){
-        return;
+
+        await loadProducts();
+
+    }catch(error){
+
+        console.error(error);
+
+        alert(
+            "更新失敗：\n\n" +
+            (error.message || "未知錯誤")
+        );
+
     }
 
-    products =
-        products.filter(p => p.id !== id);
+}
 
-    saveData();
 
-    renderProducts();
+/* =========================================================
+   刪除
+   ========================================================= */
+
+async function deleteProduct(id){
+
+    if(!confirm("確定要刪除這件商品嗎？")){
+
+        return;
+
+    }
+
+
+    try{
+
+        const { error } =
+            await supabaseClient
+                .from("products")
+                .delete()
+                .eq("id",id);
+
+
+        if(error){
+            throw error;
+        }
+
+
+        await loadProducts();
+
+
+    }catch(error){
+
+        console.error(error);
+
+        alert(
+            "刪除失敗：\n\n" +
+            (error.message || "未知錯誤")
+        );
+
+    }
 
 }
 
 
-/* 初始 */
-renderProducts();
+/* =========================================================
+   啟動
+   ========================================================= */
+
+loadProducts();
 
 </script>
 
