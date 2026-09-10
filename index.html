@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>二手衣小店</title>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    background:#f5f4f1;
+    color:#444;
+    font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC",
+    "PingFang TC","Microsoft JhengHei",sans-serif;
+}
+
+/* 頂部 */
+header{
+    background:#fff;
+    padding:28px 20px 20px;
+    border-bottom:1px solid #e5e3df;
+    position:sticky;
+    top:0;
+    z-index:10;
+}
+
+.header-inner{
+    max-width:900px;
+    margin:auto;
+}
+
+.logo{
+    font-size:22px;
+    font-weight:600;
+    letter-spacing:2px;
+    color:#333;
+}
+
+.subtitle{
+    margin-top:5px;
+    font-size:12px;
+    color:#999;
+}
+
+/* 搜尋 */
+.search{
+    margin-top:18px;
+    width:100%;
+    border:1px solid #ddd;
+    background:#f8f7f5;
+    border-radius:8px;
+    padding:11px 13px;
+    font-size:14px;
+    outline:none;
+}
+
+/* 篩選 */
+.filters{
+    max-width:900px;
+    margin:20px auto 0;
+    padding:0 20px;
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+}
+
+.filter-btn{
+    border:1px solid #ddd;
+    background:#fff;
+    padding:8px 15px;
+    border-radius:20px;
+    font-size:13px;
+    color:#666;
+    white-space:nowrap;
+    cursor:pointer;
+}
+
+.filter-btn.active{
+    background:#555;
+    color:#fff;
+    border-color:#555;
+}
+
+/* 商品區 */
+.container{
+    max-width:900px;
+    margin:25px auto 60px;
+    padding:0 20px;
+}
+
+.product-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:16px;
+}
+
+.product{
+    background:#fff;
+    border-radius:10px;
+    overflow:hidden;
+    border:1px solid #e8e6e2;
+}
+
+.product-image{
+    width:100%;
+    aspect-ratio:1/1;
+    background:#eee;
+    position:relative;
+    overflow:hidden;
+}
+
+.product-image img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.status{
+    position:absolute;
+    top:10px;
+    left:10px;
+    padding:5px 9px;
+    border-radius:5px;
+    font-size:11px;
+    background:rgba(255,255,255,.9);
+}
+
+.status.sold{
+    background:#555;
+    color:#fff;
+}
+
+.product-info{
+    padding:13px;
+}
+
+.type{
+    font-size:11px;
+    color:#999;
+    margin-bottom:5px;
+}
+
+.price{
+    font-size:19px;
+    font-weight:600;
+    color:#333;
+}
+
+.note{
+    margin-top:7px;
+    font-size:13px;
+    line-height:1.6;
+    color:#777;
+    white-space:pre-wrap;
+}
+
+.edit-area{
+    margin-top:12px;
+    display:flex;
+    gap:6px;
+}
+
+.edit-area button{
+    flex:1;
+    border:0;
+    padding:8px;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:12px;
+}
+
+.edit-btn{
+    background:#eee;
+    color:#555;
+}
+
+.sold-btn{
+    background:#555;
+    color:#fff;
+}
+
+.delete-btn{
+    background:#f1eeee;
+    color:#999;
+}
+
+/* 管理區 */
+.admin{
+    max-width:900px;
+    margin:0 auto 50px;
+    padding:0 20px;
+}
+
+.admin-box{
+    background:#fff;
+    border:1px solid #e5e3df;
+    border-radius:10px;
+    padding:20px;
+}
+
+.admin-title{
+    font-size:16px;
+    font-weight:600;
+    margin-bottom:18px;
+}
+
+.form-group{
+    margin-bottom:13px;
+}
+
+.form-group label{
+    display:block;
+    font-size:12px;
+    color:#777;
+    margin-bottom:6px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select{
+    width:100%;
+    border:1px solid #ddd;
+    border-radius:6px;
+    padding:10px;
+    font-size:14px;
+    outline:none;
+    background:#fafafa;
+}
+
+.form-group textarea{
+    min-height:80px;
+    resize:vertical;
+}
+
+.photo-preview{
+    width:100px;
+    height:100px;
+    border-radius:6px;
+    object-fit:cover;
+    margin-top:8px;
+    display:none;
+}
+
+.add-btn{
+    width:100%;
+    border:0;
+    background:#444;
+    color:#fff;
+    padding:12px;
+    border-radius:7px;
+    font-size:14px;
+    cursor:pointer;
+}
+
+.cancel-btn{
+    width:100%;
+    margin-top:8px;
+    border:1px solid #ddd;
+    background:#fff;
+    color:#777;
+    padding:11px;
+    border-radius:7px;
+    cursor:pointer;
+    display:none;
+}
+
+/* 空白 */
+.empty{
+    text-align:center;
+    padding:60px 10px;
+    color:#aaa;
+    font-size:13px;
+}
+
+/* 桌機 */
+@media(min-width:700px){
+    .product-grid{
+        grid-template-columns:repeat(3,1fr);
+    }
+}
+
+/* 手機 */
+@media(max-width:500px){
+    header{
+        padding-top:22px;
+    }
+
+    .container{
+        padding:0 12px;
+    }
+
+    .filters{
+        padding:0 12px;
+    }
+
+    .product-grid{
+        gap:10px;
+    }
+
+    .product-info{
+        padding:10px;
+    }
+
+    .price{
+        font-size:17px;
+    }
+
+    .note{
+        font-size:12px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="header-inner">
+        <div class="logo">SECOND HAND</div>
+        <div class="subtitle">喜歡的衣服，找到下一個主人 ♡</div>
+
+        <input
+            id="searchInput"
+            class="search"
+            type="text"
+            placeholder="搜尋衣服..."
+            oninput="renderProducts()"
+        >
+    </div>
+</header>
+
+<div class="filters">
+    <button class="filter-btn active" onclick="setFilter('全部',this)">全部</button>
+    <button class="filter-btn" onclick="setFilter('全新',this)">全新</button>
+    <button class="filter-btn" onclick="setFilter('二手',this)">二手</button>
+    <button class="filter-btn" onclick="setFilter('上架中',this)">上架中</button>
+    <button class="filter-btn" onclick="setFilter('售出',this)">售出</button>
+</div>
+
+<main class="container">
+
+    <div id="productGrid" class="product-grid"></div>
+
+    <div id="empty" class="empty" style="display:none;">
+        目前沒有商品 ♡
+    </div>
+
+</main>
+
+<!-- 管理區 -->
+<section class="admin">
+
+    <div class="admin-box">
+
+        <div class="admin-title">
+            商品管理
+        </div>
+
+        <div class="form-group">
+            <label>衣服照片</label>
+            <input
+                type="file"
+                id="photoInput"
+                accept="image/*"
+                onchange="previewPhoto()"
+            >
+            <img id="photoPreview" class="photo-preview">
+        </div>
+
+        <div class="form-group">
+            <label>價格</label>
+            <input
+                type="number"
+                id="priceInput"
+                placeholder="例如 500"
+            >
+        </div>
+
+        <div class="form-group">
+            <label>狀況</label>
+            <select id="conditionInput">
+                <option value="全新">全新</option>
+                <option value="二手">二手</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>備註</label>
+            <textarea
+                id="noteInput"
+                placeholder="例如：穿過2次、尺寸M、保存良好..."
+            ></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>商品狀態</label>
+            <select id="statusInput">
+                <option value="上架中">上架中</option>
+                <option value="售出">售出</option>
+            </select>
+        </div>
+
+        <button class="add-btn" onclick="saveProduct()" id="saveBtn">
+            ＋ 新增商品
+        </button>
+
+        <button class="cancel-btn" onclick="cancelEdit()" id="cancelBtn">
+            取消編輯
+        </button>
+
+    </div>
+
+</section>
+
+<script>
+
+let products = JSON.parse(localStorage.getItem("secondHandProducts")) || [];
+
+let currentFilter = "全部";
+
+let editingId = null;
+
+let photoData = "";
+
+
+/* 預設商品 */
+if(products.length === 0){
+
+    products = [
+        {
+            id:1,
+            image:"https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=800",
+            price:500,
+            condition:"二手",
+            note:"穿過幾次，保存良好",
+            status:"上架中"
+        },
+        {
+            id:2,
+            image:"https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=800",
+            price:680,
+            condition:"全新",
+            note:"全新未穿，吊牌還在",
+            status:"上架中"
+        }
+    ];
+
+    saveData();
+}
+
+
+/* 儲存 */
+function saveData(){
+
+    localStorage.setItem(
+        "secondHandProducts",
+        JSON.stringify(products)
+    );
+
+}
+
+
+/* 篩選 */
+function setFilter(filter,button){
+
+    currentFilter = filter;
+
+    document.querySelectorAll(".filter-btn")
+        .forEach(btn => btn.classList.remove("active"));
+
+    button.classList.add("active");
+
+    renderProducts();
+}
+
+
+/* 顯示商品 */
+function renderProducts(){
+
+    const grid = document.getElementById("productGrid");
+    const empty = document.getElementById("empty");
+
+    const search =
+        document.getElementById("searchInput")
+        .value
+        .toLowerCase();
+
+    grid.innerHTML = "";
+
+    let filtered = products.filter(product => {
+
+        const matchSearch =
+            product.note.toLowerCase().includes(search);
+
+        let matchFilter = true;
+
+        if(currentFilter === "全新"){
+            matchFilter = product.condition === "全新";
+        }
+
+        if(currentFilter === "二手"){
+            matchFilter = product.condition === "二手";
+        }
+
+        if(currentFilter === "上架中"){
+            matchFilter = product.status === "上架中";
+        }
+
+        if(currentFilter === "售出"){
+            matchFilter = product.status === "售出";
+        }
+
+        return matchSearch && matchFilter;
+
+    });
+
+
+    if(filtered.length === 0){
+
+        empty.style.display = "block";
+
+        return;
+
+    }
+
+    empty.style.display = "none";
+
+
+    filtered.forEach(product => {
+
+        const card = document.createElement("div");
+
+        card.className = "product";
+
+        card.innerHTML = `
+
+            <div class="product-image">
+
+                <img src="${product.image}">
+
+                <div class="status ${product.status === "售出" ? "sold" : ""}">
+                    ${product.status}
+                </div>
+
+            </div>
+
+            <div class="product-info">
+
+                <div class="type">
+                    ${product.condition}
+                </div>
+
+                <div class="price">
+                    NT$ ${Number(product.price).toLocaleString()}
+                </div>
+
+                <div class="note">
+                    ${product.note || ""}
+                </div>
+
+                <div class="edit-area">
+
+                    <button
+                        class="edit-btn"
+                        onclick="editProduct(${product.id})">
+                        編輯
+                    </button>
+
+                    <button
+                        class="sold-btn"
+                        onclick="toggleSold(${product.id})">
+                        ${product.status === "售出" ? "重新上架" : "標記售出"}
+                    </button>
+
+                    <button
+                        class="delete-btn"
+                        onclick="deleteProduct(${product.id})">
+                        刪除
+                    </button>
+
+                </div>
+
+            </div>
+        `;
+
+        grid.appendChild(card);
+
+    });
+
+}
+
+
+/* 圖片預覽 */
+function previewPhoto(){
+
+    const file =
+        document.getElementById("photoInput").files[0];
+
+    if(!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = function(e){
+
+        photoData = e.target.result;
+
+        const preview =
+            document.getElementById("photoPreview");
+
+        preview.src = photoData;
+
+        preview.style.display = "block";
+
+    };
+
+    reader.readAsDataURL(file);
+
+}
+
+
+/* 新增 / 修改 */
+function saveProduct(){
+
+    const price =
+        document.getElementById("priceInput").value;
+
+    const condition =
+        document.getElementById("conditionInput").value;
+
+    const note =
+        document.getElementById("noteInput").value;
+
+    const status =
+        document.getElementById("statusInput").value;
+
+
+    if(!price){
+
+        alert("請輸入價格");
+
+        return;
+
+    }
+
+
+    if(editingId){
+
+        const product =
+            products.find(p => p.id === editingId);
+
+        product.price = price;
+
+        product.condition = condition;
+
+        product.note = note;
+
+        product.status = status;
+
+        if(photoData){
+            product.image = photoData;
+        }
+
+    }else{
+
+        if(!photoData){
+
+            alert("請上傳照片");
+
+            return;
+
+        }
+
+        products.unshift({
+
+            id:Date.now(),
+
+            image:photoData,
+
+            price:price,
+
+            condition:condition,
+
+            note:note,
+
+            status:status
+
+        });
+
+    }
+
+
+    saveData();
+
+    renderProducts();
+
+    cancelEdit();
+
+}
+
+
+/* 編輯 */
+function editProduct(id){
+
+    const product =
+        products.find(p => p.id === id);
+
+    if(!product) return;
+
+    editingId = id;
+
+    document.getElementById("priceInput").value =
+        product.price;
+
+    document.getElementById("conditionInput").value =
+        product.condition;
+
+    document.getElementById("noteInput").value =
+        product.note;
+
+    document.getElementById("statusInput").value =
+        product.status;
+
+
+    photoData = product.image;
+
+    const preview =
+        document.getElementById("photoPreview");
+
+    preview.src = product.image;
+
+    preview.style.display = "block";
+
+
+    document.getElementById("saveBtn").innerText =
+        "儲存修改";
+
+    document.getElementById("cancelBtn").style.display =
+        "block";
+
+
+    window.scrollTo({
+        top:document.body.scrollHeight,
+        behavior:"smooth"
+    });
+
+}
+
+
+/* 取消編輯 */
+function cancelEdit(){
+
+    editingId = null;
+
+    photoData = "";
+
+    document.getElementById("priceInput").value = "";
+
+    document.getElementById("noteInput").value = "";
+
+    document.getElementById("photoInput").value = "";
+
+    document.getElementById("photoPreview").style.display =
+        "none";
+
+    document.getElementById("saveBtn").innerText =
+        "＋ 新增商品";
+
+    document.getElementById("cancelBtn").style.display =
+        "none";
+
+}
+
+
+/* 售出 */
+function toggleSold(id){
+
+    const product =
+        products.find(p => p.id === id);
+
+    if(!product) return;
+
+    product.status =
+        product.status === "售出"
+        ? "上架中"
+        : "售出";
+
+    saveData();
+
+    renderProducts();
+
+}
+
+
+/* 刪除 */
+function deleteProduct(id){
+
+    if(!confirm("確定要刪除這件商品嗎？")){
+        return;
+    }
+
+    products =
+        products.filter(p => p.id !== id);
+
+    saveData();
+
+    renderProducts();
+
+}
+
+
+/* 初始 */
+renderProducts();
+
+</script>
+
+</body>
+</html>
